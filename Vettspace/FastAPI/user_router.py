@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
-from schemas import Registration, ShowUser, RegistrationUpdate
+from schemas import ProfileSchema
 from sqlalchemy.orm import Session
-from models import User
+from models import ProfileModel
 from database import get_db
 from oauth2 import get_current_user
 
@@ -13,14 +13,14 @@ router = APIRouter(
 
 
 @router.get("/")
-def get_all_users(db: Session = Depends(get_db), current_user: Registration = Depends(get_current_user)):
-    users = db.query(User).all()
+def get_all_users(db: Session = Depends(get_db), current_user: ProfileSchema = Depends(get_current_user)):
+    users = db.query(ProfileModel).all()
     return users
 
 
-@router.get("/{id}", response_model=ShowUser)
-def get_user(id: int, db: Session = Depends(get_db), current_user: Registration = Depends(get_current_user)):
-    user = db.query(User).filter(User.id == id).first()
+@router.get("/{id}", response_model=ProfileSchema)
+def get_user(id: int, db: Session = Depends(get_db), current_user: ProfileSchema = Depends(get_current_user)):
+    user = db.query(ProfileModel).filter(ProfileModel.id == id).first()
     if not user:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
@@ -30,8 +30,8 @@ def get_user(id: int, db: Session = Depends(get_db), current_user: Registration 
 
 
 @router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update_user(id: int, request: RegistrationUpdate, db: Session = Depends(get_db), current_user: Registration = Depends(get_current_user)):
-    user = db.query(User).filter(User.id == id)
+def update_user(id: int, request: ProfileSchema, db: Session = Depends(get_db), current_user: ProfileSchema = Depends(get_current_user)):
+    user = db.query(ProfileModel).filter(ProfileModel.id == id)
     if not user.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -44,8 +44,8 @@ def update_user(id: int, request: RegistrationUpdate, db: Session = Depends(get_
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id: int, db: Session = Depends(get_db), current_user: Registration = Depends(get_current_user)):
-    user = db.query(User).filter(User.id == id)
+def delete_user(id: int, db: Session = Depends(get_db), current_user: ProfileSchema = Depends(get_current_user)):
+    user = db.query(ProfileModel).filter(ProfileModel.id == id)
     if not user.first():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
